@@ -39,6 +39,8 @@ namespace StoreWebApp
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IngredientsService>();
+            services.AddTransient<CategoriesService>();
+
 
             services.AddMvc();
         }

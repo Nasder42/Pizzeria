@@ -9,23 +9,26 @@ using StoreWebApp.Data;
 using StoreWebApp.Models.Store;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using StoreWebApp.Services;
 
 namespace StoreWebApp.Controllers
 {
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        
+        private readonly CategoriesService _categoriesService;
 
-        public CategoriesController(ApplicationDbContext context)
+
+        public CategoriesController(ApplicationDbContext context, CategoriesService categoriesService)
         {
             _context = context;
+            _categoriesService = categoriesService;
         }
 
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(await _categoriesService.GetAllCategoriesAsync());
         }
 
         // GET: Categories/Details/5
@@ -36,8 +39,7 @@ namespace StoreWebApp.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .SingleOrDefaultAsync(m => m.CategoryId == id);
+            var category = await _categoriesService.GetSingleCategoryAsync(id);
             if (category == null)
             {
                 return NotFound();
@@ -59,12 +61,11 @@ namespace StoreWebApp.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,Name,DishId")] Category category)
+        public IActionResult Create([Bind("CategoryId,Name,DishId")] Category category)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                _categoriesService.CreateCategory(category);
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -79,7 +80,7 @@ namespace StoreWebApp.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.SingleOrDefaultAsync(m => m.CategoryId == id);
+            var category = await _categoriesService.GetSingleCategoryAsync(id);
             if (category == null)
             {
                 return NotFound();
@@ -93,7 +94,7 @@ namespace StoreWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,Name,DishId")] Category category)
+        public IActionResult Edit(int id, [Bind("CategoryId,Name,DishId")] Category category)
         {
             if (id != category.CategoryId)
             {
@@ -104,12 +105,11 @@ namespace StoreWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    _categoriesService.EditCategory(id, category);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.CategoryId))
+                    if (!_categoriesService.CategoryExists(category.CategoryId))
                     {
                         return NotFound();
                     }
@@ -132,8 +132,8 @@ namespace StoreWebApp.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .SingleOrDefaultAsync(m => m.CategoryId == id);
+            var category = await _categoriesService.GetSingleCategoryAsync(id);
+
             if (category == null)
             {
                 return NotFound();
@@ -146,17 +146,10 @@ namespace StoreWebApp.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.SingleOrDefaultAsync(m => m.CategoryId == id);
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            _categoriesService.DeleteCategory(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.CategoryId == id);
         }
     }
 }

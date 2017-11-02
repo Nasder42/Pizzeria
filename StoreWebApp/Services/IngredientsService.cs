@@ -31,10 +31,6 @@ namespace StoreWebApp.Services
         {
             var ingredient = await _context.Ingredients
                 .SingleOrDefaultAsync(m => m.IngredientId == id);
-            if (ingredient == null)
-            {
-                return null;
-            }
 
             return ingredient;
         }
