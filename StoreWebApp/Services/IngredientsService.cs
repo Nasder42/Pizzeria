@@ -19,7 +19,7 @@ namespace StoreWebApp.Services
 
         public List<Ingredient> GetAllIngredients()
         {
-            return  _context.Ingredients.ToList();
+            return _context.Ingredients.ToList();
         }
 
         public async Task<IEnumerable<Ingredient>> GetAllIngredientsAsync()
@@ -27,6 +27,40 @@ namespace StoreWebApp.Services
             return await _context.Ingredients.ToListAsync();
         }
 
-        //public static async Task<IEnumerable<User>>
+        public async Task<Ingredient> GetSingleIngredient(int? id)
+        {
+            var ingredient = await _context.Ingredients
+                .SingleOrDefaultAsync(m => m.IngredientId == id);
+            if (ingredient == null)
+            {
+                return null;
+            }
+
+            return ingredient;
+        }
+
+        public async void CreateIngredient(Ingredient ingredient)
+        {
+            _context.Add(ingredient);
+            await _context.SaveChangesAsync();
+        }
+
+        public async void EditIngredient(int id, Ingredient ingredient)
+        {
+            _context.Update(ingredient);
+            await _context.SaveChangesAsync();
+        }
+
+        public async void DeleteIngredient(int id)
+        {
+            var ingredient = await _context.Ingredients.SingleOrDefaultAsync(m => m.IngredientId == id);
+            _context.Ingredients.Remove(ingredient);
+            await _context.SaveChangesAsync();
+        }
+
+        public bool IngredientExists(int id)
+        {
+            return _context.Ingredients.Any(e => e.IngredientId == id);
+        }
     }
 }

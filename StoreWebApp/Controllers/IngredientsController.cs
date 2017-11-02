@@ -8,34 +8,36 @@ using Microsoft.EntityFrameworkCore;
 using StoreWebApp.Data;
 using StoreWebApp.Models.Store;
 using Microsoft.AspNetCore.Authorization;
+using StoreWebApp.Services;
 
 namespace StoreWebApp.Controllers
 {
     public class IngredientsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IngredientsService _ingredientsService;
 
-        public IngredientsController(ApplicationDbContext context)
+        public IngredientsController(ApplicationDbContext context, IngredientsService ingredientService)
         {
             _context = context;
+            _ingredientsService = ingredientService;
         }
 
         // GET: Ingredients
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Ingredients.ToListAsync());
+            return View(await _ingredientsService.GetAllIngredientsAsync());
         }
 
         // GET: Ingredients/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var ingredient = await _context.Ingredients
-                .SingleOrDefaultAsync(m => m.IngredientId == id);
+            var ingredient = _ingredientsService.GetSingleIngredient(id);
             if (ingredient == null)
             {
                 return NotFound();
@@ -57,12 +59,11 @@ namespace StoreWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("IngredientId,Name,Image")] Ingredient ingredient)
+        public IActionResult Create([Bind("IngredientId,Name,Image")] Ingredient ingredient)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(ingredient);
-                await _context.SaveChangesAsync();
+                _ingredientsService.CreateIngredient(ingredient);
                 return RedirectToAction(nameof(Index));
             }
             return View(ingredient);
@@ -70,14 +71,14 @@ namespace StoreWebApp.Controllers
 
         // GET: Ingredients/Edit/5
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var ingredient = await _context.Ingredients.SingleOrDefaultAsync(m => m.IngredientId == id);
+            var ingredient = _ingredientsService.GetSingleIngredient(id);
             if (ingredient == null)
             {
                 return NotFound();
@@ -91,7 +92,7 @@ namespace StoreWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("IngredientId,Name,Image")] Ingredient ingredient)
+        public IActionResult Edit(int id, [Bind("IngredientId,Name,Image")] Ingredient ingredient)
         {
             if (id != ingredient.IngredientId)
             {
@@ -102,12 +103,11 @@ namespace StoreWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(ingredient);
-                    await _context.SaveChangesAsync();
+                    _ingredientsService.EditIngredient(id, ingredient);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!IngredientExists(ingredient.IngredientId))
+                    if (!_ingredientsService.IngredientExists(ingredient.IngredientId))
                     {
                         return NotFound();
                     }
@@ -123,15 +123,15 @@ namespace StoreWebApp.Controllers
 
         // GET: Ingredients/Delete/5
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var ingredient = await _context.Ingredients
-                .SingleOrDefaultAsync(m => m.IngredientId == id);
+            var ingredient = _ingredientsService.GetSingleIngredient(id);
+
             if (ingredient == null)
             {
                 return NotFound();
@@ -144,17 +144,10 @@ namespace StoreWebApp.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            var ingredient = await _context.Ingredients.SingleOrDefaultAsync(m => m.IngredientId == id);
-            _context.Ingredients.Remove(ingredient);
-            await _context.SaveChangesAsync();
+            _ingredientsService.DeleteIngredient(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool IngredientExists(int id)
-        {
-            return _context.Ingredients.Any(e => e.IngredientId == id);
         }
     }
 }
