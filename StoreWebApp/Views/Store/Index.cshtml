@@ -1,0 +1,18 @@
+﻿@model StoreWebApp.ViewModels.StoreViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<h4>Ingredients</h4>
+@*@await Html.PartialAsync("../Ingredients/Index.cshtml", @Model.Ingredients)*@
+@Html.Partial("../Ingredients/Index.cshtml", @Model.Ingredients)
+
+@*<h4>Dishes</h4>
+@Html.Partial("../Dishes/Index.cshtml")
+
+<h4>Categories</h4>
+@Html.Partial("../Categories/Index.cshtml")*@
+
