@@ -30,14 +30,14 @@ namespace StoreWebApp.Controllers
         }
 
         // GET: Ingredients/Details/5
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var ingredient = _ingredientsService.GetSingleIngredient(id);
+            var ingredient = await _ingredientsService.GetSingleIngredient(id);
             if (ingredient == null)
             {
                 return NotFound();
@@ -71,14 +71,14 @@ namespace StoreWebApp.Controllers
 
         // GET: Ingredients/Edit/5
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var ingredient = _ingredientsService.GetSingleIngredient(id);
+            var ingredient = await _ingredientsService.GetSingleIngredient(id);
             if (ingredient == null)
             {
                 return NotFound();
@@ -123,14 +123,14 @@ namespace StoreWebApp.Controllers
 
         // GET: Ingredients/Delete/5
         [Authorize(Roles = "Admin")]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var ingredient = _ingredientsService.GetSingleIngredient(id);
+            var ingredient = await _ingredientsService.GetSingleIngredient(id);
 
             if (ingredient == null)
             {
