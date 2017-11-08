@@ -40,7 +40,7 @@ namespace StoreWebApp
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IngredientsService>();
             services.AddTransient<CategoriesService>();
-
+            services.AddTransient<DishesService>();
 
             services.AddMvc();
         }

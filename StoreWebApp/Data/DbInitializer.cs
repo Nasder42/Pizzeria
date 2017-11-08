@@ -38,8 +38,12 @@ namespace StoreWebApp.Data
             if (context.Dishes.ToList().Count == 0)
             {
                 // Add Categories
-                var category = new Category { Name = "Pizza" };
-                context.Categories.Add(category);
+                var categoryPizza = new Category { Name = "Pizza" };
+                context.Categories.Add(categoryPizza);
+                context.Categories.Add(new Category { Name = "Pasta" });
+                context.Categories.Add(new Category { Name = "Sallad" });
+                context.Categories.Add(new Category { Name = "Efter-rätt" });
+
                 //context.Categories.Add(new Category { Name = "Pizza" });
                 context.Categories.Add(new Category { Name = "Assian" });
                 context.Categories.Add(new Category { Name = "Greek" });
@@ -75,8 +79,6 @@ namespace StoreWebApp.Data
 
                 //Add Pizzas
                 string directoryPath = Environment.CurrentDirectory + "/Images/Dishes/";
-                //string directoryPath = Directory.GetCurrentDirectory();
-                //string directoryPath = "/Users/Sander/Projects/2018/Asp2/Projects/Functional/PizzeriaOnline-AlexanderBranch/Data/Images/Food/Dishes/";
                 string imagePath;
 
                 var pizza = new Dish { Name = "Margherita", Price = 75 };
@@ -85,7 +87,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = tomatoes });
                 imagePath = string.Concat(directoryPath, "Margherita.png");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Alla Napoletana (Napoli)", Price = 79 };
@@ -95,7 +97,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = tomatoes });
                 imagePath = string.Concat(directoryPath, "AllaNapoletana.jpg");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Marinara", Price = 79 };
@@ -105,7 +107,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = oregano });
                 imagePath = string.Concat(directoryPath, "Marinara.jpg");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Pugliese", Price = 85 };
@@ -116,7 +118,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = onnion });
                 imagePath = string.Concat(directoryPath, "Pugliese.jpg");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Capricciosa", Price = 90 };
@@ -127,7 +129,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = mushrooms });
                 imagePath = string.Concat(directoryPath, "Capricciosa.jpg");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Veronese", Price = 85 };
@@ -136,7 +138,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = mushrooms });
                 imagePath = string.Concat(directoryPath, "Veronese.jpg");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Quattro stagioni", Price = 105 };
@@ -148,7 +150,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = olives });
                 imagePath = string.Concat(directoryPath, "Margherita.png");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Ai Quattro Formagi", Price = 95 };
@@ -159,7 +161,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = mozzarella });
                 imagePath = string.Concat(directoryPath, "QuattroStagioni.png");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 pizza = new Dish { Name = "Ai Funghi e Salsicce", Price = 95 };
@@ -169,7 +171,7 @@ namespace StoreWebApp.Data
                 pizza.DishIngredients.Add(new DishIngredient { Dish = pizza, Ingredient = mushrooms });
                 imagePath = string.Concat(directoryPath, "AiFunghiSalsicce.png");
                 pizza.Image = ImageToBinary(imagePath);
-                pizza.Category = category;
+                pizza.Category = categoryPizza;
                 context.Dishes.Add(pizza);
 
                 context.SaveChanges();

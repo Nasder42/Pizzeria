@@ -15,13 +15,13 @@ namespace StoreWebApp.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        //private readonly ApplicationDbContext _context;
         private readonly CategoriesService _categoriesService;
 
 
-        public CategoriesController(ApplicationDbContext context, CategoriesService categoriesService)
+        public CategoriesController(CategoriesService categoriesService)
         {
-            _context = context;
+            //_context = context;
             _categoriesService = categoriesService;
         }
 

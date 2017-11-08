@@ -8,36 +8,42 @@ using Microsoft.EntityFrameworkCore;
 using StoreWebApp.Data;
 using StoreWebApp.Models.Store;
 using Microsoft.AspNetCore.Authorization;
+using StoreWebApp.Services;
+using System.Net;
 
 namespace StoreWebApp.Controllers
 {
     public class DishesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        //private readonly ApplicationDbContext _context;
+        private readonly DishesService _dishesService;
+        private readonly CategoriesService _categoriesService;
 
-        public DishesController(ApplicationDbContext context)
+        public DishesController(DishesService dishesService, CategoriesService categoriesService)
         {
-            _context = context;
+            //_context = context;
+            _dishesService = dishesService;
+            _categoriesService = categoriesService;
         }
 
         // GET: Dishes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Dishes.Include(d => d.Category);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = _dishesService.GetAllDishesWithCategories();
+            return View(await applicationDbContext);
         }
 
+        //Klart
+
         // GET: Dishes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async  Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var dish = await _context.Dishes
-                .Include(d => d.Category)
-                .SingleOrDefaultAsync(m => m.DishId == id);
+            var dish = await _dishesService.GetSingleDish(id);
             if (dish == null)
             {
                 return NotFound();
@@ -50,7 +56,7 @@ namespace StoreWebApp.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Name");
+            ViewData["CategoryId"] = new SelectList(_categoriesService.GetAllCategories(), "CategoryId", "Name");
             return View();
         }
 
@@ -60,15 +66,14 @@ namespace StoreWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("DishId,Name,Price,Image,CategoryId")] Dish dish)
+        public IActionResult Create([Bind("DishId,Name,Price,ImageURL,CategoryId")] Dish dish)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(dish);
-                await _context.SaveChangesAsync();
+                _dishesService.CreateDish(dish);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Name", dish.CategoryId);
+            ViewData["CategoryId"] = new SelectList(_categoriesService.GetAllCategories(), "CategoryId", "Name", dish.CategoryId);
             return View(dish);
         }
 
@@ -81,12 +86,12 @@ namespace StoreWebApp.Controllers
                 return NotFound();
             }
 
-            var dish = await _context.Dishes.SingleOrDefaultAsync(m => m.DishId == id);
+            var dish = await _dishesService.GetSingleDish(id);
             if (dish == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Name", dish.CategoryId);
+            ViewData["CategoryId"] = new SelectList(_categoriesService.GetAllCategories(), "CategoryId", "Name", dish.CategoryId);
             return View(dish);
         }
 
@@ -96,23 +101,31 @@ namespace StoreWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("DishId,Name,Price,Image,CategoryId")] Dish dish)
+        public IActionResult Edit(int id, [Bind("DishId,Name,Price,ImageURL,CategoryId")] Dish dish)
         {
             if (id != dish.DishId)
             {
                 return NotFound();
             }
 
+            //Validate image input and add it to dish.
+            if (dish.ImageURL != null)
+            {
+                var webClient = new WebClient();
+                var imageBytes = webClient.DownloadData(dish.ImageURL);
+                dish.Image = imageBytes;
+                
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(dish);
-                    await _context.SaveChangesAsync();
+                    _dishesService.EditDish(dish);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DishExists(dish.DishId))
+                    if (!_dishesService.DishExists(dish.DishId))
                     {
                         return NotFound();
                     }
@@ -123,7 +136,7 @@ namespace StoreWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Name", dish.CategoryId);
+            ViewData["CategoryId"] = new SelectList(_categoriesService.GetAllCategories(), "CategoryId", "Name", dish.CategoryId);
             return View(dish);
         }
 
@@ -136,9 +149,7 @@ namespace StoreWebApp.Controllers
                 return NotFound();
             }
 
-            var dish = await _context.Dishes
-                .Include(d => d.Category)
-                .SingleOrDefaultAsync(m => m.DishId == id);
+            var dish = _dishesService.GetSingleDish(id);
             if (dish == null)
             {
                 return NotFound();
@@ -153,15 +164,10 @@ namespace StoreWebApp.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var dish = await _context.Dishes.SingleOrDefaultAsync(m => m.DishId == id);
-            _context.Dishes.Remove(dish);
-            await _context.SaveChangesAsync();
+            _dishesService.DeleteDish(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DishExists(int id)
-        {
-            return _context.Dishes.Any(e => e.DishId == id);
-        }
+        
     }
 }

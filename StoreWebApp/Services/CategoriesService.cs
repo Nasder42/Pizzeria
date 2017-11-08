@@ -22,6 +22,11 @@ namespace StoreWebApp.Services
             return await _context.Categories.ToListAsync();
         }
 
+        public IEnumerable<Category> GetAllCategories()
+        {
+            return _context.Categories;
+        }
+
         public async Task<Category> GetSingleCategoryAsync(int? id)
         {
             var category = await _context.Categories
